@@ -7,6 +7,10 @@
     "build": "webpack",
     "dev": "webpack -w"
   },
+  "dependencies": {
+    "apollo-server": "^3.9.0",
+    "graphql": "^16.5.0"
+  },
   "devDependencies": {
     "@types/jest": "^28.1.4",
     "@typescript-eslint/eslint-plugin": "^5.30.4",
