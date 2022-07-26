@@ -1,42 +1,20 @@
 import fs from 'fs'
 
+import { PrismaClient } from '@prisma/client'
 import { ApolloServer } from 'apollo-server'
 
-import type { ApolloServerExpressConfig } from 'apollo-server-express'
+import { resolvers } from '@/resolvers'
+import { getUserId } from '@/utils/geuUserId'
 
-// NOTE: 仮のデータ
-const links = [
-  {
-    id: 1,
-    description: 'GraphQLチュートリアルをUdemyで学ぶ',
-    url: 'https://sample.com'
-  }
-]
-
-// リソルバ関数
-const resolvers: ApolloServerExpressConfig['resolvers'] = {
-  Query: {
-    info: () => 'HackerNewsクローンlll',
-    feed: () => links
-  },
-  Mutation: {
-    post: (_, { description, url }) => {
-      const link = {
-        id: links.length + 1,
-        description,
-        url
-      }
-
-      links.push(link)
-
-      return link
-    }
-  }
-}
-
+const prisma = new PrismaClient()
 const server = new ApolloServer({
   typeDefs: fs.readFileSync('src/schemas/index.graphql', 'utf-8'),
-  resolvers
+  resolvers,
+  context: ({ req }) => ({
+    ...req,
+    prisma,
+    userId: req.headers.authorization ? getUserId(req) : null
+  })
 })
 
 server.listen().then(({ url }) => console.log(`\x1b[32m${url}\x1b[39m`))
